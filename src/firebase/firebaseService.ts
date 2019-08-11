@@ -7,7 +7,7 @@ export default class FirebaseService implements IFirebaseService {
   private currentUser: firebase.auth.UserCredential | null = null;
   private firebaseInstance!: firebase.app.App;
 
-  private get firstore() {
+  private get firestore() {
     return this.firebaseInstance.firestore();
   }
 
@@ -43,7 +43,9 @@ export default class FirebaseService implements IFirebaseService {
           this.currentUser = userCredentials;
           resolve();
         })
-        .catch(error => reject(error));
+        .catch(error => {
+          reject(error);
+        });
     });
   }
 
@@ -51,7 +53,7 @@ export default class FirebaseService implements IFirebaseService {
     return new Promise((resolve, reject) => {
       if (this.currentUser && this.currentUser.user) {
         const userPath = this.currentUser.user.uid;
-        const newDocumentRef = this.firstore.collection(`items/${userPath}/${category}/`).doc();
+        const newDocumentRef = this.firestore.collection(`items/${userPath}/${category}/`).doc();
 
         resolve(newDocumentRef);
       } else {
