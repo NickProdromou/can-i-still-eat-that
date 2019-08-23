@@ -1,5 +1,5 @@
 import firebase from 'firebase';
-import { IFirebaseService } from './models';
+import { IFirebaseService } from '@/firebase/models';
 import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/storage';
