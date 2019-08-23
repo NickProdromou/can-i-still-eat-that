@@ -1,14 +1,11 @@
 import { GenericFirebaseError } from '@/firebase/models';
 import { Nullable } from '@/shared/types';
-import { IRootState, LoadingState } from '../models';
+import { IRootState, LoadingState, IUserModule } from '../models';
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators';
-
-function isUserCredential(user: any): user is firebase.auth.UserCredential {
-  return user && user.user !== undefined;
-}
+import { isUserCredential } from '../guards';
 
 @Module({ name: 'user', namespaced: true })
-export default class User extends VuexModule<{}, IRootState> {
+export default class User extends VuexModule<IUserModule, IRootState> {
   private userError: Nullable<GenericFirebaseError> = null;
   private currentUser: Nullable<firebase.auth.UserCredential> = null;
   private userState: LoadingState = LoadingState.pending;

@@ -24,13 +24,15 @@ export interface IdentifiedPerishableItem extends PerishableItem {
 }
 
 export interface IFirebaseService {
-  addItem(documentRef: firebase.firestore.DocumentReference, item: PerishableItem): Promise<void>;
+  addItem(documentRef: firebase.firestore.DocumentReference, item: PerishableItem): Promise<void | GenericFirebaseError>;
 
   createEmailAccount(email: string, password: string): Promise<firebase.auth.UserCredential | GenericFirebaseError>;
 
   signInWithEmail(emailAddress: string, password: string): Promise<firebase.auth.UserCredential | GenericFirebaseError>;
 
   signUserOut(): Promise<void | GenericFirebaseError>;
+
+  deleteUser(user: Nullable<firebase.auth.UserCredential>): Promise<void>;
 
   getItemsFromCategory(
     user: Nullable<firebase.auth.UserCredential>,
@@ -50,6 +52,8 @@ export interface IFirebaseService {
   ): Promise<firebase.storage.UploadTask | GenericFirebaseError>;
 
   destroyStaleReference(documentRef: firebase.firestore.DocumentReference): Promise<void>;
+
+  deleteItem(user: Nullable<firebase.auth.UserCredential>, category: ItemCategories, key: string): Promise<void | GenericFirebaseError>;
 }
 
 export interface GenericFirebaseError {

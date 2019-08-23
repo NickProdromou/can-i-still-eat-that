@@ -19,8 +19,16 @@ export default class FirebaseService implements IFirebaseService {
     return this.firebaseInstance.storage();
   }
 
-  public addItem(documentRef: firebase.firestore.DocumentReference, item: PerishableItem): Promise<void> {
-    return documentRef.set(item);
+  public addItem(documentRef: firebase.firestore.DocumentReference, item: PerishableItem): Promise<void | GenericFirebaseError> {
+    return new Promise((resolve, reject) => {
+      try {
+        documentRef.set(item);
+
+        resolve();
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   public createEmailAccount(email: string, password: string): Promise<firebase.auth.UserCredential | GenericFirebaseError> {
@@ -46,14 +54,6 @@ export default class FirebaseService implements IFirebaseService {
         });
       }
     });
-  }
-
-  public deleteUserData(uid: string): void {
-    this.firestore
-      .collection('items')
-      .doc(uid)
-      .delete();
-    this.storage.ref(`items/${uid}`).delete();
   }
 
   public signInWithEmail(emailAddress: string, password: string): Promise<firebase.auth.UserCredential | GenericFirebaseError> {
@@ -100,7 +100,7 @@ export default class FirebaseService implements IFirebaseService {
       } else {
         reject({
           code: 'auth/no-current-user',
-          message: 'unable to create reference'
+          message: 'unable to get items'
         });
       }
     });
@@ -149,7 +149,7 @@ export default class FirebaseService implements IFirebaseService {
     return documentRef.delete();
   }
 
-  public deleteItem(user: Nullable<firebase.auth.UserCredential>, category: ItemCategories, key: string) {
+  public deleteItem(user: Nullable<firebase.auth.UserCredential>, category: ItemCategories, key: string): Promise<void | GenericFirebaseError> {
     return new Promise((resolve, reject) => {
       if (user && user.user) {
         const userItems = this.firestore.collection('items').doc(user.user.uid);
@@ -163,5 +163,13 @@ export default class FirebaseService implements IFirebaseService {
         });
       }
     });
+  }
+
+  private deleteUserData(uid: string): void {
+    this.firestore
+      .collection('items')
+      .doc(uid)
+      .delete();
+    this.storage.ref(`items/${uid}`).delete();
   }
 }
