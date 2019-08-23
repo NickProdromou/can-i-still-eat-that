@@ -1,10 +1,10 @@
-import { IFirebaseService, ItemCategories, PerishableItem, GenericFirebaseError } from './models';
-import FirebaseInit from './firebaseInit';
+import { GenericFirebaseError, IFirebaseService, ItemCategories, PerishableItem, IdentifiedPerishableItem } from './models';
+import { Nullable } from '@/shared/types';
 import config from '../config/index';
+import FirebaseInit from './firebaseInit';
 
 @FirebaseInit(config.firebaseApp)
 export default class FirebaseService implements IFirebaseService {
-  private currentUser: firebase.auth.UserCredential | null = null;
   private firebaseInstance!: firebase.app.App;
 
   private get firestore() {
@@ -23,24 +23,57 @@ export default class FirebaseService implements IFirebaseService {
     return documentRef.set(item);
   }
 
-  public createEmailAccount(email: string, password: string): Promise<void | GenericFirebaseError> {
+  public createEmailAccount(email: string, password: string): Promise<firebase.auth.UserCredential | GenericFirebaseError> {
     return new Promise((resolve, reject) => {
       this.auth
         .createUserWithEmailAndPassword(email, password)
         .then(userCredentials => {
-          this.currentUser = userCredentials;
-          resolve();
+          resolve(userCredentials);
         })
         .catch(err => reject(err));
     });
   }
 
-  public signInWithEmail(emailAddress: string, password: string): Promise<void | GenericFirebaseError> {
+  public deleteUser(user: Nullable<firebase.auth.UserCredential>): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (user && user.user) {
+        this.deleteUserData(user.user.uid);
+        resolve(user.user.delete());
+      } else {
+        reject({
+          code: 'auth/no-current-user',
+          message: 'unable to delete user'
+        });
+      }
+    });
+  }
+
+  public deleteUserData(uid: string): void {
+    this.firestore
+      .collection('items')
+      .doc(uid)
+      .delete();
+    this.storage.ref(`items/${uid}`).delete();
+  }
+
+  public signInWithEmail(emailAddress: string, password: string): Promise<firebase.auth.UserCredential | GenericFirebaseError> {
     return new Promise((resolve, reject) => {
       this.auth
         .signInWithEmailAndPassword(emailAddress, password)
         .then(userCredentials => {
-          this.currentUser = userCredentials;
+          resolve(userCredentials);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  }
+
+  public signUserOut(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.auth
+        .signOut()
+        .then(() => {
           resolve();
         })
         .catch(error => {
@@ -49,10 +82,37 @@ export default class FirebaseService implements IFirebaseService {
     });
   }
 
-  public createNewItemReference(category: ItemCategories): Promise<firebase.firestore.DocumentReference | firebase.firestore.FirestoreError> {
+  public getItemsFromCategory(
+    user: Nullable<firebase.auth.UserCredential>,
+    category: ItemCategories
+  ): Promise<IdentifiedPerishableItem[] | GenericFirebaseError> {
+    return new Promise(async (resolve, reject) => {
+      if (user && user.user) {
+        const docRef = this.firestore.collection('items').doc(`${user.user.uid}`);
+        const collection = await docRef.collection(category).get();
+
+        const mappedCollections = collection.docs.map(doc => ({
+          ...doc.data(),
+          id: doc.id
+        }));
+
+        resolve(mappedCollections as IdentifiedPerishableItem[]);
+      } else {
+        reject({
+          code: 'auth/no-current-user',
+          message: 'unable to create reference'
+        });
+      }
+    });
+  }
+
+  public createNewItemReference(
+    user: Nullable<firebase.auth.UserCredential>,
+    category: ItemCategories
+  ): Promise<firebase.firestore.DocumentReference | firebase.firestore.FirestoreError> {
     return new Promise((resolve, reject) => {
-      if (this.currentUser && this.currentUser.user) {
-        const userPath = this.currentUser.user.uid;
+      if (user && user.user) {
+        const userPath = user.user.uid;
         const newDocumentRef = this.firestore.collection(`items/${userPath}/${category}/`).doc();
 
         resolve(newDocumentRef);
@@ -66,13 +126,14 @@ export default class FirebaseService implements IFirebaseService {
   }
 
   public uploadImage(
+    user: Nullable<firebase.auth.UserCredential>,
     category: ItemCategories,
     reference: firebase.firestore.DocumentReference,
     file: File
   ): Promise<firebase.storage.UploadTask | GenericFirebaseError> {
     return new Promise((resolve, reject) => {
-      if (this.currentUser && this.currentUser.user) {
-        const userPath = this.currentUser.user.uid;
+      if (user && user.user) {
+        const userPath = user.user.uid;
 
         resolve(this.storage.ref(`items/${userPath}/${category}/${reference.id}`).put(file));
       } else {
@@ -86,5 +147,21 @@ export default class FirebaseService implements IFirebaseService {
 
   public destroyStaleReference(documentRef: firebase.firestore.DocumentReference): Promise<void> {
     return documentRef.delete();
+  }
+
+  public deleteItem(user: Nullable<firebase.auth.UserCredential>, category: ItemCategories, key: string) {
+    return new Promise((resolve, reject) => {
+      if (user && user.user) {
+        const userItems = this.firestore.collection('items').doc(user.user.uid);
+        const itemToDelete = userItems.collection(category).doc(key);
+
+        resolve(itemToDelete.delete());
+      } else {
+        reject({
+          code: 'auth/no-current-user',
+          message: 'unable to delete item'
+        });
+      }
+    });
   }
 }
