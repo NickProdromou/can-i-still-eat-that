@@ -1,6 +1,6 @@
 import { GenericFirebaseError } from '@/firebase/models';
 import { Nullable } from '@/shared/types';
-import { IRootState, LoadingState, IUserModule } from '../models';
+import { IRootState, LoadingState, IUserModule } from '@/store/models';
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 import { isUserCredential } from '../guards';
 

@@ -4,6 +4,7 @@ import Vuex, { StoreOptions } from 'vuex';
 import { IRootState } from '@/store/models';
 import User from './modules/user';
 import Items from './modules/items';
+import UI from './modules/ui';
 
 Vue.use(Vuex);
 
@@ -13,7 +14,8 @@ const store: StoreOptions<IRootState> = {
   },
   modules: {
     user: User,
-    items: Items
+    items: Items,
+    ui: UI
   }
 };
 
