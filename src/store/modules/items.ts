@@ -1,7 +1,7 @@
 import { IdentifiedPerishableItem, ItemCategories, PerishableItem, GenericFirebaseError } from '@/firebase/models';
 import { Nullable, Existable } from '@/shared/types';
 import { Action, Module, VuexModule, Mutation } from 'vuex-module-decorators';
-import { IRootState, LoadingState, IItemsModule, IUserModule } from '../models';
+import { IRootState, LoadingState, IItemsModule, IUserModule } from '@/store/models.ts';
 import User from './user';
 import { isUserCredential, isItemCategories, isDocumentReference } from '../guards';
 
