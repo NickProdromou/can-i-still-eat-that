@@ -22,8 +22,13 @@ export enum LoadingState {
   error = 'error'
 }
 
+export interface IUiModule {
+  mainNavigationDrawer: boolean
+}
+
 export interface IRootState {
   firebaseService: IFirebaseService;
   user?: IUserModule;
   items?: IItemsModule;
+  ui?: IUiModule
 }
