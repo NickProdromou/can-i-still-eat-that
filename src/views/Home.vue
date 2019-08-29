@@ -1,14 +1,18 @@
 <template>
-  <HelloWorld />
+  <ViewTemplate :name="$route.name">
+    <template v-slot:content>
+      <p>login/signup</p>
+    </template>
+  </ViewTemplate>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from '@/components/HelloWorld.vue';
+import { Component, Vue, Prop } from 'vue-property-decorator';
+import ViewTemplate from '@/components/ViewTemplate.vue';
 
 @Component({
   components: {
-    HelloWorld
+    ViewTemplate
   }
 })
 export default class Home extends Vue {}
