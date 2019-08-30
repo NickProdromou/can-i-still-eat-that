@@ -5,7 +5,7 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 import { isUserCredential } from '../guards';
 
 @Module({ name: 'user', namespaced: true })
-export default class User extends VuexModule<IUserModule, IRootState> {
+export default class User extends VuexModule<{}, IRootState> {
   private userError: Nullable<GenericFirebaseError> = null;
   private currentUser: Nullable<firebase.auth.UserCredential> = null;
   private userState: LoadingState = LoadingState.pending;

@@ -8,6 +8,13 @@ export interface IFirebaseAppConfig {
   appId: string;
 }
 
+export interface INavigationDrawerLink {
+  to: string;
+  title: string;
+  auth: boolean;
+}
+
 export interface IAppConfig {
   firebaseApp: IFirebaseAppConfig;
+  drawerLinks: INavigationDrawerLink[];
 }
