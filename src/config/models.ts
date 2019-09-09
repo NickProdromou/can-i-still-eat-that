@@ -12,6 +12,7 @@ export interface INavigationDrawerLink {
   to: string;
   title: string;
   auth: boolean;
+  icon: string;
 }
 
 export interface IAppConfig {

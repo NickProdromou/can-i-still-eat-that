@@ -1,11 +1,12 @@
 <template>
-  <v-navigation-drawer stateless :value="drawerOpen" app>
+  <v-navigation-drawer stateless :value="drawerOpen" app dark>
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title class="title">Application</v-list-item-title>
-        <v-list-item-subtitle>subtext</v-list-item-subtitle>
+        <v-list-item-title class="title">welcome</v-list-item-title>
+        <v-list-item-subtitle>sign in or sign up to proceed</v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
+
     <LinkProvider v-slot="{ filteredLinks }">
       <template v-for="link in filteredLinks">
         <DrawerLink :key="link.title" :link="link"></DrawerLink>

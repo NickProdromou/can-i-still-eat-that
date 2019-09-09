@@ -11,11 +11,11 @@ const config: IAppConfig = {
     appId: process.env.VUE_APP_firebase_appId
   },
   drawerLinks: [
-    { title: 'Items', auth: true, to: '/items' },
-    { title: 'Add new item', auth: true, to: '/add-item' },
-    { title: 'Profile', auth: true, to: '/profile' },
-    { title: 'Sign Up', auth: false, to: '/sign-up' },
-    { title: 'sign In', auth: false, to: '/sign-in' },
+    { title: 'Items', auth: true, to: '/items', icon: 'mdi-food' },
+    { title: 'Add new item', auth: true, to: '/add-item', icon: 'mdi-plus' },
+    { title: 'Profile', auth: true, to: '/profile', icon: 'mdi-account-circle' },
+    { title: 'Sign In', auth: false, to: '/sign-in', icon: 'mdi-account' },
+    { title: 'Sign Up', auth: false, to: '/sign-up', icon: 'mdi-account-plus' }
   ]
 };
 
